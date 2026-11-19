@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio Java (versión web) — Aprendiz de Brujo · Estadística Inferencial</title>
+<style>
+:root{--p1:#4C1D95;--p2:#6D28D9;--bg:#FAF8FE;--ink:#1F2937;--gray:#6B7280;--line:#E4DCF5;--green:#22C55E;--teal:#0D9488;--code:#12121C;--codetx:#D7E0EA;--gold:#F5D0A9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Calibri,"Segoe UI",system-ui,-apple-system,Arial,sans-serif}
+header{background:linear-gradient(120deg,var(--p1),var(--p2));color:#fff;padding:28px 20px 24px}
+.wrap{max-width:1180px;margin:0 auto}
+header .serie{letter-spacing:.14em;text-transform:uppercase;font-size:12px;opacity:.8}
+header h1{margin:4px 0 4px;font:700 30px/1.15 Georgia,"Times New Roman",serif}
+header p{margin:0;opacity:.92;max-width:760px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:3px 12px;font-size:13px}
+.how{background:#fff;border-bottom:1px solid var(--line)}
+.how .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px 20px}
+.step{display:flex;gap:10px;align-items:flex-start;font-size:14.5px}
+.step b{flex:none;width:26px;height:26px;border-radius:50%;background:var(--p2);color:#fff;display:grid;place-items:center;font-size:14px}
+main.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;padding:20px}
+.search{position:sticky;top:0;z-index:5;background:var(--bg);padding:0 0 10px}
+.search input{width:100%;font:inherit;padding:10px 14px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+.search input:focus{outline:2px solid var(--p2);border-color:var(--p2)}
+.grupo{margin:14px 0 0;font:700 15px Georgia,serif;color:var(--p1);border-bottom:2px solid var(--line);padding-bottom:4px}
+.grupo.prog{color:var(--teal)}
+.row{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;background:#fff;border:1px solid var(--line);border-left:4px solid var(--p2);border-radius:10px;padding:8px 10px;margin:8px 0;scroll-margin-top:70px}
+.row.sel{border-color:var(--p2);box-shadow:0 0 0 3px rgba(109,40,217,.18)}
+.id{font:700 13px Consolas,"Courier New",monospace;color:#fff;background:var(--p1);border-radius:6px;padding:2px 8px}
+.t{font-size:15px}
+.btns{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+button{font:600 13.5px inherit;font-family:inherit;border-radius:8px;padding:6px 12px;border:1.5px solid var(--p2);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.b-con{background:var(--p2);color:#fff}
+.b-imp{background:#fff;color:var(--p1)}
+.b-both{background:var(--teal);border-color:var(--teal);color:#fff}
+button:hover{filter:brightness(1.08)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button svg{width:15px;height:15px;fill:currentColor}
+.consola{position:sticky;top:12px;align-self:start;background:var(--code);border-radius:12px;overflow:hidden;box-shadow:0 8px 24px rgba(30,20,60,.25)}
+.consola .bar{display:flex;align-items:center;gap:8px;background:#0B0B12;padding:8px 12px;color:var(--green);font:700 13px Consolas,monospace;letter-spacing:.06em}
+.consola .bar .sp{flex:1}
+.consola .bar button{font-size:12px;padding:3px 10px;background:transparent;color:var(--codetx);border-color:#3a3a52}
+.dots i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}
+pre#salida{margin:0;padding:14px 16px;color:var(--codetx);font:13px/1.45 Consolas,"Courier New",monospace;min-height:340px;max-height:calc(100vh - 140px);overflow:auto;white-space:pre}
+pre#salida .h{color:var(--green)}
+pre#salida .d{color:#9AA0B4}
+.nota{font-size:13px;color:var(--gray);padding:10px 14px 4px;max-width:1180px;margin:0 auto}
+footer{padding:18px 20px 40px;color:var(--gray);font-size:13px;text-align:center}
+#printSheet{display:none}
+@media (max-width:860px){
+ .how .wrap{grid-template-columns:1fr}
+ main.wrap{grid-template-columns:1fr}
+ .consola{position:static;order:-1}
+ pre#salida{min-height:150px;max-height:60vh;font-size:11px;padding:12px}
+ header h1{font-size:24px}
+}
+@media print{
+ @page{margin:16mm}
+ body>*:not(#printSheet){display:none!important}
+ body{background:#fff}
+ #printSheet{display:block;color:#000}
+ #printSheet .enc{font:700 12pt Georgia,serif;color:#4C1D95;border-bottom:2px solid #4C1D95;padding-bottom:4px;margin-bottom:10px}
+ #printSheet pre{font:10pt/1.35 "Courier New",Consolas,monospace;white-space:pre-wrap;margin:0}
+ #printSheet .pie{margin-top:12px;font:9pt Calibri,Arial,sans-serif;color:#555;border-top:1px solid #ccc;padding-top:4px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+ <div class="serie">Serie Aprendiz de Brujo</div>
+ <h1>Laboratorio Java · versión web</h1>
+ <p>Principios de Estadística Inferencial mediante Estructuras Básicas (EB). Ejecuta aquí los programas y ejercicios del libro, directamente en tu navegador.</p>
+ <div class="chips"><span class="chip">Sin instalar nada</span><span class="chip">Funciona en computador, tableta y celular</span><span class="chip">Resultados idénticos al programa Java del libro</span></div>
+</div></header>
+<section class="how"><div class="wrap">
+ <div class="step"><b>1</b><span>Busca el programa o el ejercicio por su código (por ejemplo <code>E04-4</code>) o por su tema.</span></div>
+ <div class="step"><b>2</b><span>Pulsa <strong>Consola</strong> para verlo en pantalla, <strong>Imprimir</strong> para enviarlo a la impresora (o guardarlo en PDF) o <strong>Ambos</strong>.</span></div>
+ <div class="step"><b>3</b><span>Compara con la respuesta del Solucionario. Es el mismo cálculo que hace el código Java del libro.</span></div>
+</div></section>
+
+<main class="wrap">
+ <section aria-label="Lista de programas y ejercicios">
+  <div class="search"><input id="q" type="search" placeholder="Buscar: E07, proporción, regresión…" aria-label="Buscar programa o ejercicio" autocomplete="off"></div>
+  <div id="lista"></div>
+ </section>
+ <section class="consola" aria-label="Consola de resultados">
+  <div class="bar"><span class="dots"><i style="background:#F87171"></i><i style="background:#FBBF24"></i><i style="background:#34D399"></i></span>CONSOLA<span class="sp"></span><button id="bCopiar" type="button">Copiar</button><button id="bLimpiar" type="button">Limpiar</button></div>
+  <div id="avisoVisor" hidden style="background:#2A2342;color:#F5D0A9;font-size:12.5px;padding:8px 14px">Estás viendo el Laboratorio dentro de un visor: ahí el navegador puede bloquear la impresión. Ábrelo en su propia pestaña, o usa «Copiar» y pega el resultado en tu documento.</div>
+  <pre id="salida" aria-live="polite"><span class="d">Elige un programa o ejercicio de la lista y pulsa «Consola» o «Ambos».
+El resultado aparecerá aquí.</span></pre>
+ </section>
+</main>
+<div class="nota">Las simulaciones usan semillas fijas: por eso tu resultado coincide con el del libro cada vez que lo ejecutas. Para imprimir en PDF elige «Guardar como PDF» en el cuadro de impresión del navegador.</div>
+<footer>© Fernando de Jesús Gutiérrez Caballero · Los Duros · Serie Aprendiz de Brujo</footer>
+<div id="printSheet" aria-hidden="true"><div class="enc">Aprendiz de Brujo · Estadística Inferencial con EB — Laboratorio Java</div><pre id="printPre"></pre><div class="pie" id="piePrint"></div></div>
+
+<script>
+/* =============================================================
+   APRENDIZ DE BRUJO - Laboratorio Web (nucleo)
+   Traduccion a JavaScript de los programas Java del libro.
+   Reproduce java.util.Random y printf de Java, de modo que cada
+   salida coincide caracter por caracter con la del programa Java.
+   ============================================================= */
+(function (root) {
+'use strict';
+
+/* ---------- java.util.Random (LCG de 48 bits, sin BigInt) ---------- */
+function JRandom(seed) {
+  var s = BigInt.asUintN(48, BigInt(seed) ^ 0x5DEECE66Dn);
+  this.h = Number(s >> 24n); this.l = Number(s & 0xFFFFFFn);
+  this.haveNext = false; this.nextNext = 0;
+}
+JRandom.prototype.next = function (bits) {
+  var ML = 0xECE66D, MH = 0x5DE, T24 = 16777216;
+  var p0 = this.l * ML + 0xB;
+  var nl = p0 % T24, carry = Math.floor(p0 / T24);
+  var nh = (this.h * ML + this.l * MH + carry) % T24;
+  this.l = nl; this.h = nh;
+  var v = Math.floor((nh * T24 + nl) / Math.pow(2, 48 - bits));
+  return bits === 32 ? (v | 0) : v;
+};
+JRandom.prototype.nextInt = function (bound) {
+  var r = this.next(31), m = bound - 1;
+  if ((bound & m) === 0) return Math.floor(bound * r / 2147483648);
+  for (var u = r; u - (r = u % bound) + m > 2147483647; u = this.next(31)) { }
+  return r;
+};
+JRandom.prototype.nextBoolean = function () { return this.next(1) !== 0; };
+JRandom.prototype.nextDouble = function () {
+  return (this.next(26) * 134217728 + this.next(27)) / 9007199254740992;
+};
+JRandom.prototype.nextGaussian = function () {
+  if (this.haveNext) { this.haveNext = false; return this.nextNext; }
+  var v1, v2, s;
+  do {
+    v1 = 2 * this.nextDouble() - 1; v2 = 2 * this.nextDouble() - 1;
+    s = v1 * v1 + v2 * v2;
+  } while (s >= 1 || s === 0);
+  var mul = Math.sqrt(-2 * Math.log(s) / s);
+  this.nextNext = v2 * mul; this.haveNext = true;
+  return v1 * mul;
+};
+
+/* ---------- printf de Java (subconjunto: %d %f %s %n %%) ---------- */
+function fixedJava(x, prec) {
+  if (Number.isNaN(x)) return 'NaN';
+  if (!isFinite(x)) return x > 0 ? 'Infinity' : '-Infinity';
+  var neg = x < 0 || Object.is(x, -0), a = Math.abs(x);
+  var parts = a.toExponential().split('e'), digits = parts[0].replace('.', ''), e10 = parseInt(parts[1], 10);
+  var D = BigInt(digits), ex = e10 - (digits.length - 1) + prec, R;
+  if (ex >= 0) R = D * (10n ** BigInt(ex));
+  else { var dv = 10n ** BigInt(-ex); R = (2n * D + dv) / (2n * dv); }
+  var str = R.toString();
+  while (str.length < prec + 1) str = '0' + str;
+  var res = prec > 0 ? str.slice(0, str.length - prec) + '.' + str.slice(str.length - prec) : str;
+  return (neg ? '-' : '') + res;
+}
+function jfmt(fmt) {
+  var args = Array.prototype.slice.call(arguments, 1), ai = 0;
+  return fmt.replace(/%([-0]*)(\d*)(?:\.(\d+))?([dfsn%])/g, function (m, flags, width, prec, conv) {
+    if (conv === 'n') return '\n';
+    if (conv === '%') return '%';
+    var v = args[ai++], s;
+    if (conv === 'd') s = String(Math.trunc(v));
+    else if (conv === 'f') s = fixedJava(v, prec === undefined ? 6 : parseInt(prec, 10));
+    else s = String(v);
+    var w = width ? parseInt(width, 10) : 0;
+    while (s.length < w) s = flags.indexOf('-') >= 0 ? s + ' ' : ' ' + s;
+    return s;
+  });
+}
+function Salida() {
+  var b = [];
+  return {
+    println: function (s) { b.push((s === undefined ? '' : s) + '\n'); },
+    printf: function () { b.push(jfmt.apply(null, arguments)); },
+    text: function () { return b.join(''); }
+  };
+}
+function repeat(c, n) { var s = ''; for (var i = 0; i < n; i++) s += c; return s; }
+function stripTrailing(s) { return s.replace(/\s+$/, ''); }
+
+/* ---------- funciones numericas (iguales a las de Java) ---------- */
+function lnGamma(x) {
+  var c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+  var y = x, tmp = x + 5.5;
+  tmp -= (x + 0.5) * Math.log(tmp);
+  var ser = 1.000000000190015;
+  for (var j = 0; j < 6; j++) ser += c[j] / ++y;
+  return -tmp + Math.log(2.5066282746310005 * ser / x);
+}
+function cdfNormal(z) {
+  var pasos = 20000, a = -8, h = (z - a) / pasos, area = 0;
+  for (var i = 0; i < pasos; i++) {
+    var x1 = a + i * h, x2 = x1 + h;
+    area += (Math.exp(-x1 * x1 / 2) + Math.exp(-x2 * x2 / 2)) * h / 2 / Math.sqrt(2 * Math.PI);
+  }
+  return area;
+}
+function areaNormal(a, b) {
+  var pasos = 20000, h = (b - a) / pasos, area = 0;
+  for (var i = 0; i < pasos; i++) {
+    var x1 = a + i * h, x2 = x1 + h;
+    area += (Math.exp(-x1 * x1 / 2) + Math.exp(-x2 * x2 / 2)) * h / 2 / Math.sqrt(2 * Math.PI);
+  }
+  return area;
+}
+function densT(x, v) {
+  var lg = lnGamma((v + 1) / 2) - lnGamma(v / 2) - 0.5 * Math.log(v * Math.PI);
+  return Math.exp(lg - (v + 1) / 2 * Math.log(1 + x * x / v));
+}
+function pDosColasT(t, v) {
+  var pasos = 20000, b = Math.abs(t), h = b / pasos, s = densT(0, v) + densT(b, v);
+  for (var i = 1; i < pasos; i++) s += densT(i * h, v) * (i % 2 === 0 ? 2 : 4);
+  return 1 - 2 * (s * h / 3);
+}
+function criticoT(alfa, v) {
+  var lo = 0, hi = 20;
+  for (var i = 0; i < 60; i++) { var mid = (lo + hi) / 2; if (pDosColasT(mid, v) > alfa) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+function pChi2(x, gl) {
+  var a = gl / 2.0, z = x / 2, termino = 1.0 / a, suma = termino;
+  for (var n = 1; n < 500; n++) { termino *= z / (a + n); suma += termino; }
+  return 1 - Math.exp(-z + a * Math.log(z) - lnGamma(a)) * suma;
+}
+function densF(x, d1, d2) {
+  var lnB = lnGamma(d1 / 2) + lnGamma(d2 / 2) - lnGamma((d1 + d2) / 2);
+  return Math.exp(0.5 * d1 * Math.log(d1 / d2) + (d1 / 2 - 1) * Math.log(x) - (d1 + d2) / 2 * Math.log(1 + d1 * x / d2) - lnB);
+}
+function pColaF(f, d1, d2) {
+  var pasos = 40000, a = 1e-9, h = (f - a) / pasos, s = densF(a, d1, d2) + densF(f, d1, d2);
+  for (var i = 1; i < pasos; i++) s += densF(a + i * h, d1, d2) * (i % 2 === 0 ? 2 : 4);
+  return 1 - s * h / 3;
+}
+function criticoF(alfa, d1, d2) {
+  var lo = 0.01, hi = 50;
+  for (var i = 0; i < 60; i++) { var mid = (lo + hi) / 2; if (pColaF(mid, d1, d2) > alfa) lo = mid; else hi = mid; }
+  return (lo + hi) / 2;
+}
+function comb(n, k) { var r = 1; for (var i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; }
+function media(a) { var s = 0; for (var i = 0; i < a.length; i++) s += a[i]; return s / a.length; }
+function varMuestral(a) { var m = media(a), s = 0; for (var i = 0; i < a.length; i++) s += (a[i] - m) * (a[i] - m); return s / (a.length - 1); }
+
+/* ================= PROGRAMAS DEL LIBRO (E01-E15) ================= */
+var PROG = {};
+
+PROG.E01 = function (o) {
+  o = o || {}; var out = Salida();
+  var poblacion = [34, 41, 28, 55, 47, 39, 62, 30, 45, 51, 38, 29, 60, 44, 33, 48, 57, 36, 42, 50];
+  var sumaPob = 0; poblacion.forEach(function (e) { sumaPob += e; });
+  var mediaPob = sumaPob / poblacion.length;
+  var muestra = o.muestra || [41, 28, 47, 30, 50];
+  var sumaMue = 0; muestra.forEach(function (e) { sumaMue += e; });
+  var mediaMue = sumaMue / muestra.length;
+  out.println('DE LA DESCRIPCION A LA INFERENCIA');
+  out.println('=================================');
+  out.println('Tamano de la poblacion (N) : ' + poblacion.length);
+  out.println('Tamano de la muestra   (n) : ' + muestra.length);
+  out.println();
+  out.printf('Parametro   mu      (media poblacion) : %.2f anios%n', mediaPob);
+  out.printf('Estadistico x-barra (media muestra)   : %.2f anios%n', mediaMue);
+  out.printf('Error de estimacion                   : %.2f anios%n', Math.abs(mediaPob - mediaMue));
+  out.println();
+  out.println('La inferencia usa x-barra para estimar mu,');
+  out.println('que casi nunca podemos medir por completo.');
+  return out.text();
+};
+
+PROG.E02 = function () {
+  var out = Salida();
+  var fav = 48, pos = 200, p = fav / pos;
+  out.println('PROBABILIDAD DE UN EVENTO');
+  out.println('=========================');
+  out.printf('P(hipertension)    = %d / %d = %.2f%n', fav, pos, p);
+  out.printf('P(no hipertension) = 1 - %.2f  = %.2f%n', p, 1 - p);
+  out.println();
+  out.println('Regla de oro:  0 <= P(A) <= 1');
+  out.println('   0 = imposible        1 = seguro');
+  out.println();
+  var caras = 0, lanz = 100000, azar = new JRandom(7);
+  for (var i = 0; i < lanz; i++) if (azar.nextBoolean()) caras++;
+  var frec = caras / lanz;
+  out.println('Experimento: lanzar una moneda muchas veces');
+  out.printf('  %d caras en %d lanzamientos%n', caras, lanz);
+  out.printf('  Frecuencia relativa de cara = %.4f  (teoria: 0.5000)%n', frec);
+  return out.text();
+};
+
+PROG.E03 = function (o) {
+  o = o || {}; var out = Salida();
+  var a = o.a === undefined ? -1 : o.a, b = o.b === undefined ? 1 : o.b;
+  var etiqueta = o.etiqueta || 'P(-1 < Z < 1) ~ %.4f   (regla empirica: 0.68)%n';
+  out.println('DISTRIBUCIONES CLAVE DE LA INFERENCIA');
+  out.println('=====================================');
+  out.println('La NORMAL es la base. Veamos su forma y su area.');
+  out.println();
+  var zs = [-3, -2, -1, 0, 1, 2, 3];
+  out.println('   z      f(z)    curva');
+  zs.forEach(function (z) {
+    var fz = Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
+    var n = Math.round(fz * 100);
+    out.printf('%5.1f   %.4f   %s%n', z, fz, repeat('#', n));
+  });
+  out.println();
+  var n = 10000, h = (b - a) / n, area = 0;
+  for (var i = 0; i < n; i++) {
+    var x1 = a + i * h, x2 = a + (i + 1) * h;
+    var f1 = Math.exp(-x1 * x1 / 2) / Math.sqrt(2 * Math.PI), f2 = Math.exp(-x2 * x2 / 2) / Math.sqrt(2 * Math.PI);
+    area += (f1 + f2) * h / 2;
+  }
+  out.printf(etiqueta, area);
+  out.println();
+  out.println('Otras distribuciones y cuando se usan:');
+  out.println('  t de Student : medias con muestras pequenas');
+  out.println('  Chi-cuadrado : conteos y varianzas');
+  out.println('  F            : comparar varianzas / ANOVA');
+  return out.text();
+};
+
+PROG.E04 = function (o) {
+  o = o || {}; var out = Salida();
+  var azar = new JRandom(11), N = 1000, poblacion = [], suma = 0, i, k;
+  for (i = 0; i < N; i++) { poblacion[i] = 125 + 15 * azar.nextGaussian(); suma += poblacion[i]; }
+  var mu = suma / N, acum = 0;
+  poblacion.forEach(function (x) { acum += (x - mu) * (x - mu); });
+  var sigma = Math.sqrt(acum / N);
+  var n = o.n || 25, rep = 1000, medias = [];
+  for (k = 0; k < rep; k++) {
+    var s = 0;
+    for (i = 0; i < n; i++) s += poblacion[azar.nextInt(N)];
+    medias[k] = s / n;
+  }
+  var sumaMedias = 0; medias.forEach(function (m) { sumaMedias += m; });
+  var mm = sumaMedias / rep, acum2 = 0;
+  medias.forEach(function (m) { acum2 += (m - mm) * (m - mm); });
+  var desv = Math.sqrt(acum2 / rep);
+  out.println('DISTRIBUCION MUESTRAL DE LA MEDIA');
+  out.println('=================================');
+  out.printf('Poblacion: N = %d   mu = %.2f   sigma = %.2f%n', N, mu, sigma);
+  out.printf('Muestras : %d muestras de tamano n = %d%n%n', rep, n);
+  out.println('Las primeras 5 medias muestrales (cada una distinta):');
+  for (k = 0; k < 5; k++) out.printf('  muestra %d : x-barra = %.2f%n', k + 1, medias[k]);
+  out.printf('%nMedia de las medias      : %.2f   (se parece a mu = %.2f)%n', mm, mu);
+  out.printf('Desviacion de las medias : %.2f   (sigma/raiz(n) = %.2f)%n%n', desv, sigma / Math.sqrt(n));
+  var min = medias[0], max = medias[0];
+  medias.forEach(function (m) { if (m < min) min = m; if (m > max) max = m; });
+  out.println('Histograma de las medias (cada # = 8 muestras):');
+  for (var b = Math.floor(min / 2) * 2; b < max; b += 2) {
+    var c = 0;
+    medias.forEach(function (m) { if (m >= b && m < b + 2) c++; });
+    out.printf('  %5.0f - %-5.0f %4d  %s%n', b, b + 2, c, repeat('#', Math.trunc(c / 8)));
+  }
+  return out.text();
+};
+
+PROG.E05 = function (o) {
+  o = o || {}; var out = Salida();
+  var azar = new JRandom(5), mediaPob = 10, sigmaPob = 10, tamanos = o.tamanos || [1, 5, 30, 100], rep = 2000;
+  out.println('TEOREMA DEL LIMITE CENTRAL');
+  out.println('==========================');
+  out.println('Poblacion asimetrica: tiempo de espera en urgencias (min)');
+  out.printf('mu = %.0f   sigma = %.0f   (asimetria teorica = 2)%n%n', mediaPob, sigmaPob);
+  out.println('   n   media   EE simulado   EE teorico   asimetria');
+  out.println('  ---------------------------------------------------');
+  tamanos.forEach(function (n) {
+    var medias = [], k, i;
+    for (k = 0; k < rep; k++) {
+      var s = 0;
+      for (i = 0; i < n; i++) s += -mediaPob * Math.log(1 - azar.nextDouble());
+      medias[k] = s / n;
+    }
+    var sum = 0; medias.forEach(function (m) { sum += m; });
+    var med = sum / rep, c2 = 0, c3 = 0;
+    medias.forEach(function (m) { c2 += Math.pow(m - med, 2); c3 += Math.pow(m - med, 3); });
+    var sd = Math.sqrt(c2 / rep), asim = (c3 / rep) / Math.pow(sd, 3);
+    out.printf('  %3d   %5.2f   %10.2f   %10.2f   %9.2f%n', n, med, sd, sigmaPob / Math.sqrt(n), asim);
+  });
+  out.println();
+  out.println('Al crecer n: el error estandar baja como sigma/raiz(n)');
+  out.println('y la asimetria tiende a 0 (la campana normal).');
+  return out.text();
+};
+
+PROG.E06 = function (o) {
+  o = o || {}; var out = Salida();
+  var x = [182, 195, 210, 176, 224, 188, 201, 169, 215, 190], n = x.length, suma = 0;
+  x.forEach(function (v) { suma += v; });
+  var med = suma / n, ss = 0;
+  x.forEach(function (v) { ss += (v - med) * (v - med); });
+  var varN1 = ss / (n - 1), s = Math.sqrt(varN1), exitos = 0;
+  x.forEach(function (v) { if (v >= 200) exitos++; });
+  var pG = exitos / n;
+  out.println('ESTIMACION PUNTUAL');
+  out.println('==================');
+  out.printf('Media muestral   x-barra = %.2f   (estima mu)%n', med);
+  out.printf('Varianza (n-1)   s^2     = %.2f%n', varN1);
+  out.printf('Desviacion       s       = %.2f   (estima sigma)%n', s);
+  out.printf('Proporcion       p-gorro = %d/%d = %.2f   (estima pi)%n%n', exitos, n, pG);
+  var azar = new JRandom(3), sigma2 = 15 * 15, nm = o.nm || 5, rep = 20000, acumN = 0, acumN1 = 0;
+  for (var r = 0; r < rep; r++) {
+    var m = [], sm = 0, i;
+    for (i = 0; i < nm; i++) { m[i] = 100 + 15 * azar.nextGaussian(); sm += m[i]; }
+    var mm = sm / nm, q = 0;
+    m.forEach(function (v) { q += (v - mm) * (v - mm); });
+    acumN += q / nm; acumN1 += q / (nm - 1);
+  }
+  out.println('Simulacion: 20000 muestras de n = ' + nm + ' con sigma^2 = 225');
+  out.printf('  Promedio de s^2 dividiendo entre n    : %.1f   (se queda corto)%n', acumN / rep);
+  out.printf('  Promedio de s^2 dividiendo entre n-1  : %.1f   (acierta a %.0f)%n', acumN1 / rep, sigma2);
+  return out.text();
+};
+
+PROG.E07 = function (o) {
+  o = o || {}; var out = Salida();
+  var x = [118, 132, 125, 140, 121, 129, 136, 117, 127, 134, 123, 130], n = x.length;
+  var med = media(x), ss = 0;
+  x.forEach(function (v) { ss += (v - med) * (v - med); });
+  var s = Math.sqrt(ss / (n - 1)), ee = s / Math.sqrt(n);
+  var conf = [90, 95, 99], t = [1.796, 2.201, 3.106];
+  out.println('INTERVALO DE CONFIANZA PARA LA MEDIA');
+  out.println('====================================');
+  out.printf('n = %d   x-barra = %.2f   s = %.2f   EE = %.2f%n%n', n, med, s, ee);
+  out.println('  Confianza    t       Intervalo            Ancho');
+  for (var i = 0; i < conf.length; i++) {
+    var mg = t[i] * ee;
+    out.printf('   %2.0f %%      %.3f   (%.2f ; %.2f)    %.2f%n', conf[i], t[i], med - mg, med + mg, 2 * mg);
+  }
+  var tSim = o.tSim || 2.201, nivel = o.nivel || 95;
+  var azar = new JRandom(21), mu = 100, sigma = 15, rep = 1000, aciertos = 0;
+  for (var r = 0; r < rep; r++) {
+    var m = [], sm = 0, j;
+    for (j = 0; j < n; j++) { m[j] = mu + sigma * azar.nextGaussian(); sm += m[j]; }
+    var mm = sm / n, q = 0;
+    m.forEach(function (v) { q += (v - mm) * (v - mm); });
+    var mg2 = tSim * Math.sqrt(q / (n - 1)) / Math.sqrt(n);
+    if (mu >= mm - mg2 && mu <= mm + mg2) aciertos++;
+  }
+  out.printf('%nSimulacion: %d intervalos al ' + nivel + '%% con mu = %.0f%n', rep, mu);
+  out.printf('  Atraparon a mu : %d de %d  (%.1f %%)%n', aciertos, rep, 100.0 * aciertos / rep);
+  return out.text();
+};
+
+PROG.E08 = function (o) {
+  o = o || {}; var out = Salida();
+  var n = 200, exitos = 48, p = exitos / n, z = 1.96, ee = Math.sqrt(p * (1 - p) / n), mg = z * ee;
+  out.println('INTERVALO PARA UNA PROPORCION');
+  out.println('=============================');
+  out.printf('p-gorro = %d/%d = %.3f   EE = %.4f%n', exitos, n, p, ee);
+  out.printf('IC 95 %% : (%.3f ; %.3f)   margen de error = %.3f%n%n', p - mg, p + mg, mg);
+  var e = 0.03, nNec = Math.ceil(z * z * 0.5 * 0.5 / (e * e));
+  out.printf('Para un margen de error de %.0f %% se necesitan n = %.0f personas%n%n', e * 100, nNec);
+  var m = 20, s = o.s || 4.2, s2 = s * s, chiInf = 8.907, chiSup = 32.852;
+  var vMin = (m - 1) * s2 / chiSup, vMax = (m - 1) * s2 / chiInf;
+  out.println('INTERVALO PARA LA VARIANZA');
+  out.println('==========================');
+  out.printf('n = %d   s = %.1f   s^2 = %.2f   gl = %d%n', m, s, s2, m - 1);
+  out.printf('IC 95 %% para sigma^2 : (%.2f ; %.2f)%n', vMin, vMax);
+  out.printf('IC 95 %% para sigma   : (%.2f ; %.2f)%n', Math.sqrt(vMin), Math.sqrt(vMax));
+  return out.text();
+};
+
+PROG.E09 = function (o) {
+  o = o || {}; var out = Salida();
+  var mu0 = 120, sigma = 15, alfa = o.alfa || 0.05, zc = o.zc || 1.96, n = 36, xbar = 125.5;
+  var ee = sigma / Math.sqrt(n), z = (xbar - mu0) / ee, p = 2 * (1 - cdfNormal(Math.abs(z)));
+  out.println('PRUEBA DE HIPOTESIS PARA UNA MEDIA');
+  out.println('==================================');
+  out.printf('H0: mu = %.0f      H1: mu distinto de %.0f%n', mu0, mu0);
+  out.printf('n = %d   x-barra = %.1f   sigma = %.0f   alfa = %.2f%n%n', n, xbar, sigma, alfa);
+  out.printf('Error estandar  EE = %.2f%n', ee);
+  out.printf('Estadistico     z  = %.2f%n', z);
+  out.printf('Valor p            = %.4f%n', p);
+  out.printf('Valor critico   +/-%.2f%n%n', zc);
+  out.println(p < alfa ? 'DECISION: p < alfa  ->  se RECHAZA H0' : 'DECISION: p >= alfa ->  NO se rechaza H0');
+  var azar = new JRandom(9), rep = 10000, rech = 0;
+  for (var r = 0; r < rep; r++) {
+    var s = 0;
+    for (var i = 0; i < n; i++) s += mu0 + sigma * azar.nextGaussian();
+    var zr = (s / n - mu0) / ee;
+    if (Math.abs(zr) > zc) rech++;
+  }
+  out.printf('%nSimulacion con H0 verdadera (%d pruebas):%n', rep);
+  out.printf('  Rechazos por error (tipo I) : %d  (%.2f %%)  -> esperado %.0f %%%n', rech, 100.0 * rech / rep, alfa * 100);
+  return out.text();
+};
+
+PROG.E10 = function (o) {
+  o = o || {}; var out = Salida();
+  var pas = [118, 131, 115, 126, 121, 129, 133, 117, 124, 138, 122, 127, 119, 130, 125, 120];
+  var mu0 = o.mu0 || 120, alfa = 0.05, n = pas.length;
+  var xbar = media(pas), ss = 0;
+  pas.forEach(function (v) { ss += (v - xbar) * (v - xbar); });
+  var s = Math.sqrt(ss / (n - 1)), ee = s / Math.sqrt(n);
+  var t = (xbar - mu0) / ee, p = pDosColasT(t, n - 1), tc = criticoT(alfa, n - 1);
+  out.println('PARTE 1 - PRUEBA t PARA UNA MEDIA');
+  out.println('=================================');
+  out.printf('H0: mu = %.0f   H1: mu distinto de %.0f   (alfa = %.2f)%n', mu0, mu0, alfa);
+  out.printf('n = %d   x-barra = %.2f   s = %.2f   EE = %.3f%n', n, xbar, s, ee);
+  out.printf('Estadistico t = %.3f   (gl = %d)%n', t, n - 1);
+  out.printf('Valor p       = %.4f   (una cola: %.4f)%n', p, p / 2);
+  out.printf('Valor critico = +/-%.3f%n', tc);
+  out.printf('IC 95%% = [%.2f ; %.2f]  -> %s ' + mu0 + '%n', xbar - tc * ee, xbar + tc * ee,
+    (xbar - tc * ee > mu0 || xbar + tc * ee < mu0) ? 'NO contiene' : 'contiene');
+  out.println(p < alfa ? 'DECISION: se RECHAZA H0' : 'DECISION: NO se rechaza H0');
+  var x = 58, m = 200, p0 = 0.25, ph = x / m, ep = Math.sqrt(p0 * (1 - p0) / m), z = (ph - p0) / ep;
+  var pz = 2 * (1 - cdfNormal(Math.abs(z)));
+  out.println();
+  out.println('PARTE 2 - PRUEBA z PARA UNA PROPORCION');
+  out.println('======================================');
+  out.printf('H0: p = %.2f   H1: p distinto de %.2f%n', p0, p0);
+  out.printf('Complicaciones: %d de %d   p-gorro = %.3f%n', x, m, ph);
+  out.printf('Error estandar bajo H0 = %.4f%n', ep);
+  out.printf('Estadistico z = %.3f   Valor p = %.4f%n', z, pz);
+  out.println(pz < alfa ? 'DECISION: se RECHAZA H0' : 'DECISION: NO se rechaza H0');
+  return out.text();
+};
+
+PROG.E11 = function (o) {
+  o = o || {}; var out = Salida();
+  var trat = [3.1, 4.2, 2.8, 3.9, 3.5, 4.4, 2.6, 3.3, 4.0, 3.0], ctrl = [4.8, 5.1, 4.4, 6.2, 4.0, 5.3, 4.9, 5.8, 3.9, 5.0];
+  if (o.cinco) { trat = trat.slice(0, 5); ctrl = ctrl.slice(0, 5); }
+  var n1 = trat.length, n2 = ctrl.length, v1 = varMuestral(trat) / n1, v2 = varMuestral(ctrl) / n2;
+  var dif = media(trat) - media(ctrl), ee = Math.sqrt(v1 + v2);
+  var gl = (v1 + v2) * (v1 + v2) / (v1 * v1 / (n1 - 1) + v2 * v2 / (n2 - 1));
+  var t = dif / ee, p = pDosColasT(t, gl), tc = criticoT(0.05, gl);
+  out.println('PARTE 1 - DOS GRUPOS INDEPENDIENTES (t de Welch)');
+  out.println('================================================');
+  out.println('H0: mu1 = mu2     H1: mu1 distinto de mu2');
+  out.printf('Tratamiento: media = %.2f   s = %.3f   n = %d%n', media(trat), Math.sqrt(varMuestral(trat)), n1);
+  out.printf('Control    : media = %.2f   s = %.3f   n = %d%n', media(ctrl), Math.sqrt(varMuestral(ctrl)), n2);
+  out.printf('Diferencia = %.2f   EE = %.3f   gl = %.2f%n', dif, ee, gl);
+  out.printf('Estadistico t = %.3f   Valor p = %.5f%n', t, p);
+  out.printf('IC 95%% de la diferencia = [%.2f ; %.2f]%n', dif - tc * ee, dif + tc * ee);
+  out.println(p < 0.05 ? 'DECISION: se RECHAZA H0 (los grupos difieren)' : 'DECISION: NO se rechaza H0');
+  var antes = [152, 148, 160, 145, 158, 150, 163, 155], despues = [144, 147, 150, 142, 149, 146, 152, 150], n = antes.length, d = [];
+  for (var i = 0; i < n; i++) d[i] = antes[i] - despues[i];
+  var dm = media(d), sd = Math.sqrt(varMuestral(d)), eep = sd / Math.sqrt(n), tp = dm / eep, pp = pDosColasT(tp, n - 1);
+  out.println();
+  out.println('PARTE 2 - DATOS PAREADOS (t sobre las diferencias)');
+  out.println('==================================================');
+  out.println('H0: la diferencia media es 0     H1: es distinta de 0');
+  out.printf('Diferencia media = %.3f   s(d) = %.3f   n = %d pares%n', dm, sd, n);
+  out.printf('Estadistico t = %.3f   (gl = %d)   Valor p = %.5f%n', tp, n - 1, pp);
+  out.println(pp < 0.05 ? 'DECISION: se RECHAZA H0 (hubo cambio)' : 'DECISION: NO se rechaza H0');
+  return out.text();
+};
+
+PROG.E12 = function (o) {
+  o = o || {}; var out = Salida();
+  var g = [[24, 27, 22, 26, 25, 23, 28, 25], o.BigualA ? [24, 27, 22, 26, 25, 23, 28, 25] : [29, 31, 27, 33, 30, 28, 32, 30], [26, 25, 30, 24, 28, 27, 29, 26]];
+  var k = g.length, n = g[0].length, N = k * n, m = [], gran = 0, i, j;
+  for (i = 0; i < k; i++) { m[i] = 0; g[i].forEach(function (v) { m[i] += v; }); m[i] /= n; gran += m[i] / k; }
+  var ssb = 0, ssw = 0;
+  for (i = 0; i < k; i++) { ssb += n * (m[i] - gran) * (m[i] - gran); g[i].forEach(function (v) { ssw += (v - m[i]) * (v - m[i]); }); }
+  var msb = ssb / (k - 1), msw = ssw / (N - k), F = msb / msw, p = pColaF(F, k - 1, N - k), fc = criticoF(0.05, k - 1, N - k);
+  out.println('ANOVA DE UN FACTOR (3 metodos, 8 observaciones cada uno)');
+  out.println('========================================================');
+  out.printf('Medias: A = %.3f   B = %.3f   C = %.3f   gran media = %.3f%n', m[0], m[1], m[2], gran);
+  out.println();
+  out.println('Fuente            SC      gl      CM        F');
+  out.printf('Entre grupos   %7.3f   %3d   %7.3f   %6.3f%n', ssb, k - 1, msb, F);
+  out.printf('Dentro grupos  %7.3f   %3d   %7.3f%n', ssw, N - k, msw);
+  out.printf('Total          %7.3f   %3d%n%n', ssb + ssw, N - 1);
+  out.printf('Valor p = %.5f   F critico (5%%) = %.3f   eta^2 = %.3f%n', p, fc, ssb / (ssb + ssw));
+  out.println(p < 0.05 ? 'DECISION: se RECHAZA H0 (al menos un metodo difiere)' : 'DECISION: NO se rechaza H0');
+  var azar = new JRandom(12), tCrit = 2.1448, rep = 10000, rechAnova = 0, algunaT = 0;
+  for (var r = 0; r < rep; r++) {
+    var mm = [], vv = [], gm = 0;
+    for (i = 0; i < k; i++) {
+      var x = []; mm[i] = 0; vv[i] = 0;
+      for (j = 0; j < n; j++) { x[j] = 50 + 10 * azar.nextGaussian(); mm[i] += x[j]; }
+      mm[i] /= n;
+      for (j = 0; j < n; j++) vv[i] += (x[j] - mm[i]) * (x[j] - mm[i]);
+      gm += mm[i] / k;
+    }
+    var b = 0, w = 0;
+    for (i = 0; i < k; i++) { b += n * (mm[i] - gm) * (mm[i] - gm); w += vv[i]; }
+    if ((b / (k - 1)) / (w / (N - k)) > fc) rechAnova++;
+    var alguna = false;
+    for (i = 0; i < k; i++) for (j = i + 1; j < k; j++) {
+      var sp = (vv[i] + vv[j]) / (2 * n - 2);
+      if (Math.abs(mm[i] - mm[j]) / Math.sqrt(sp * 2.0 / n) > tCrit) alguna = true;
+    }
+    if (alguna) algunaT++;
+  }
+  out.printf('%nSimulacion SIN diferencia real (%d experimentos):%n', rep);
+  out.printf('  ANOVA declara diferencia por error          : %5.2f %%%n', 100.0 * rechAnova / rep);
+  out.printf('  Tres pruebas t por parejas (alguna falsa)   : %5.2f %%%n', 100.0 * algunaT / rep);
+  return out.text();
+};
+
+PROG.E13 = function (o) {
+  o = o || {}; var out = Salida();
+  var fil = ['Tratamiento A', 'Tratamiento B'];
+  var ob = o.tabla || [[8, 22, 40], [20, 25, 25]], r = ob.length, c = ob[0].length, tf = [], tc = [], N = 0, i, j;
+  for (i = 0; i < r; i++) tf[i] = 0;
+  for (j = 0; j < c; j++) tc[j] = 0;
+  for (i = 0; i < r; i++) for (j = 0; j < c; j++) { tf[i] += ob[i][j]; tc[j] += ob[i][j]; N += ob[i][j]; }
+  out.println('PARTE 1 - PRUEBA DE INDEPENDENCIA (tabla 2 x 3)');
+  out.println('===============================================');
+  out.println('H0: la respuesta es independiente del tratamiento');
+  var chi2 = 0;
+  out.println('Frecuencias esperadas bajo H0:');
+  for (i = 0; i < r; i++) {
+    out.printf('  %-14s', fil[i]);
+    for (j = 0; j < c; j++) {
+      var e = tf[i] * tc[j] / N;
+      chi2 += (ob[i][j] - e) * (ob[i][j] - e) / e;
+      out.printf('%8.2f', e);
+    }
+    out.println();
+  }
+  var gl = (r - 1) * (c - 1), p = pChi2(chi2, gl), v = Math.sqrt(chi2 / (N * (Math.min(r, c) - 1)));
+  out.printf('%nChi-cuadrado = %.3f   gl = %d   Valor p = %.5f%n', chi2, gl, p);
+  out.printf('V de Cramer    = %.3f%n', v);
+  out.println(p < 0.05 ? 'DECISION: se RECHAZA H0 (hay relacion)' : 'DECISION: NO se rechaza H0');
+  var obs = [38, 24, 25, 22, 41], total = 0;
+  obs.forEach(function (x) { total += x; });
+  var esp = total / obs.length, chi = 0;
+  obs.forEach(function (x) { chi += (x - esp) * (x - esp) / esp; });
+  var p2 = pChi2(chi, obs.length - 1);
+  out.println();
+  out.println('PARTE 2 - BONDAD DE AJUSTE (urgencias de lunes a viernes)');
+  out.println('=========================================================');
+  out.printf('Observadas: 38 24 25 22 41   Esperada por dia = %.1f%n', esp);
+  out.printf('Chi-cuadrado = %.3f   gl = %d   Valor p = %.5f%n', chi, obs.length - 1, p2);
+  out.println(p2 < 0.05 ? 'DECISION: se RECHAZA H0 (no se reparten por igual)' : 'DECISION: NO se rechaza H0');
+  return out.text();
+};
+
+PROG.E14 = function (o) {
+  o = o || {}; var out = Salida();
+  var x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], y = [148, 150, 143, 145, 139, 140, 134, 137, 131, o.ultimoY || 129], n = x.length;
+  var mx = 0, my = 0, i;
+  for (i = 0; i < n; i++) { mx += x[i] / n; my += y[i] / n; }
+  var sxx = 0, syy = 0, sxy = 0;
+  for (i = 0; i < n; i++) { sxx += (x[i] - mx) * (x[i] - mx); syy += (y[i] - my) * (y[i] - my); sxy += (x[i] - mx) * (y[i] - my); }
+  var b = sxy / sxx, a = my - b * mx, r = sxy / Math.sqrt(sxx * syy), r2 = r * r, sce = 0;
+  for (i = 0; i < n; i++) { var e = y[i] - (a + b * x[i]); sce += e * e; }
+  var s = Math.sqrt(sce / (n - 2)), eeb = s / Math.sqrt(sxx), t = b / eeb, p = pDosColasT(t, n - 2), tc = criticoT(0.05, n - 2);
+  out.println('CORRELACION Y REGRESION LINEAL SIMPLE');
+  out.println('=====================================');
+  out.printf('n = %d   media x = %.1f   media y = %.1f%n', n, mx, my);
+  out.printf('Correlacion r = %.4f   R^2 = %.4f%n', r, r2);
+  out.printf('Recta: y = %.3f + (%.3f) x%n', a, b);
+  out.printf('Error estandar de la regresion s = %.3f%n', s);
+  out.printf('Error estandar de la pendiente   = %.4f%n', eeb);
+  out.printf('H0: pendiente = 0   t = %.3f   (gl = %d)   p = %.6f%n', t, n - 2, p);
+  out.printf('IC 95%% de la pendiente = [%.3f ; %.3f]%n', b - tc * eeb, b + tc * eeb);
+  out.printf('Prediccion con x = 5.5 horas: y = %.1f mmHg%n', a + b * 5.5);
+  var azar = new JRandom(14), rep = 10000, falsos = 0;
+  for (var k = 0; k < rep; k++) {
+    var u = [], w = [], mu = 0, mw = 0;
+    for (i = 0; i < n; i++) { u[i] = azar.nextGaussian(); w[i] = azar.nextGaussian(); mu += u[i] / n; mw += w[i] / n; }
+    var suu = 0, sww = 0, suw = 0;
+    for (i = 0; i < n; i++) { suu += (u[i] - mu) * (u[i] - mu); sww += (w[i] - mw) * (w[i] - mw); suw += (u[i] - mu) * (w[i] - mw); }
+    var rr = suw / Math.sqrt(suu * sww), tt = rr * Math.sqrt((n - 2) / (1 - rr * rr));
+    if (Math.abs(tt) > tc) falsos++;
+  }
+  out.printf('%nSimulacion con variables sin relacion (%d muestras de n = %d):%n', rep, n);
+  out.printf("  Correlaciones 'significativas' por azar: %d  (%.2f %%)%n", falsos, 100.0 * falsos / rep);
+  return out.text();
+};
+
+function mediana(a) { var b = a.slice().sort(function (p, q) { return p - q; }), n = b.length; return n % 2 === 1 ? b[(n - 1) / 2] : (b[n / 2 - 1] + b[n / 2]) / 2; }
+PROG.E15 = function (o) {
+  o = o || {}; var out = Salida();
+  var big = o.grande || 48, A = [4, 5, 6, 7, 5.5, 8, 6.5, 9], B = [7.5, 9, 8.5, 11, 10, 12.5, 14, big];
+  var n1 = A.length, n2 = B.length, N = n1 + n2, i, q;
+  var todos = A.concat(B), orden = todos.slice().sort(function (p, r) { return p - r; }), rango = [], corr = 0;
+  for (i = 0; i < N;) {
+    var j = i;
+    while (j < N && orden[j] === orden[i]) j++;
+    var rm = (i + 1 + j) / 2.0;
+    for (q = 0; q < N; q++) if (todos[q] === orden[i]) rango[q] = rm;
+    var t = j - i; corr += t * t * t - t; i = j;
+  }
+  var R1 = 0; for (i = 0; i < n1; i++) R1 += rango[i];
+  var U1 = R1 - n1 * (n1 + 1) / 2.0, U = Math.min(U1, n1 * n2 - U1), mu = n1 * n2 / 2.0;
+  var sigma = Math.sqrt(n1 * n2 / 12.0 * ((N + 1) - corr / (N * (N - 1.0))));
+  var z = (Math.abs(U - mu) - 0.5) / sigma, pU = 2 * (1 - cdfNormal(z));
+  var v1 = varMuestral(A) / n1, v2 = varMuestral(B) / n2, tW = (media(A) - media(B)) / Math.sqrt(v1 + v2);
+  var gl = (v1 + v2) * (v1 + v2) / (v1 * v1 / (n1 - 1) + v2 * v2 / (n2 - 1)), pW = pDosColasT(tW, gl);
+  out.println('PARTE 1 - U DE MANN-WHITNEY (dos grupos independientes)');
+  out.println('=======================================================');
+  out.printf('Mediana A = %.2f   Mediana B = %.2f   (media B = %.2f, inflada por el ' + big + ')%n', mediana(A), mediana(B), media(B));
+  out.printf('Suma de rangos de A = %.1f   U = %.1f%n', R1, U);
+  out.printf('z = %.3f   Valor p (Mann-Whitney) = %.5f%n', z, pU);
+  out.printf('Para comparar, t de Welch = %.3f   Valor p = %.4f   (el ' + big + ' le infla la varianza)%n', tW, pW);
+  out.println(pU < 0.05 ? 'DECISION: se RECHAZA H0 (los grupos difieren)' : 'DECISION: NO se rechaza H0');
+  var antes = [7, 6, 8, 5, 9, 7, 6, 8, 7, 9, 6, 8], despues = [5, 5, 6, 6, 6, 4, 5, 6, 5, 7, 7, 5], mas = 0, menos = 0;
+  for (i = 0; i < antes.length; i++) { if (antes[i] > despues[i]) mas++; else if (antes[i] < despues[i]) menos++; }
+  var m = mas + menos, k = Math.min(mas, menos), cola = 0;
+  for (i = 0; i <= k; i++) cola += comb(m, i) / Math.pow(2, m);
+  var pS = Math.min(1.0, 2 * cola);
+  out.println();
+  out.println('PARTE 2 - PRUEBA DE LOS SIGNOS EXACTA (dolor antes/despues)');
+  out.println('===========================================================');
+  out.printf('Mejoraron: %d   Empeoraron: %d   Sin cambio: %d%n', mas, menos, antes.length - m);
+  out.printf('Valor p exacto (binomial, p = 0.5) = %.5f%n', pS);
+  out.println(pS < 0.05 ? 'DECISION: se RECHAZA H0 (el tratamiento reduce el dolor)' : 'DECISION: NO se rechaza H0');
+  return out.text();
+};
+
+/* ================= CALCULADORAS Y VARIANTES DE EJERCICIOS ================= */
+var CALC = {};
+function F() { return jfmt.apply(null, arguments); }
+
+CALC.e02_1 = function () { var p = 4.0 / 52;
+  return 'EJERCICIO E02-1: baraja de 52 cartas\n' + F('P(as)    = 4/52  = %.4f%n', p) + F('P(no as) = 48/52 = %.4f%n', 1 - p) + F('Suma     = %.4f + %.4f = %.4f%n', p, 1 - p, p + 1 - p); };
+CALC.e02_2 = function () { var p = 90.0 / 300;
+  return 'EJERCICIO E02-2: contratos y demandas\n' + F('P(demanda)    ~ 90/300 = %.2f%n', p) + F('P(no demanda) ~ 1 - %.2f = %.2f%n', p, 1 - p); };
+CALC.e02_3 = function () { var p = 6.0 / 150;
+  return 'EJERCICIO E02-3: piezas defectuosas\n' + F('Proporcion defectuosa en la muestra = 6/150 = %.2f%n', p) + F('Esperadas en 10000 piezas = 10000 x %.2f = %.0f%n', p, 10000 * p) + 'Supuesto: la muestra es representativa de todo el lote.\n'; };
+CALC.e02_4 = function () {
+  function frec(l, s) { var az = new JRandom(s), c = 0; for (var i = 0; i < l; i++) if (az.nextBoolean()) c++; return c / l; }
+  var out = Salida(), max20 = 0, max100k = 0;
+  out.println('MONEDA: 20 lanzamientos frente a 100000 (teoria: 0.5000)');
+  out.println('==================================================');
+  out.println('Semilla   Frecuencia (20)   Frecuencia (100000)');
+  for (var s = 1; s <= 8; s++) {
+    var a = frec(20, s), b = frec(100000, s);
+    max20 = Math.max(max20, Math.abs(a - 0.5)); max100k = Math.max(max100k, Math.abs(b - 0.5));
+    out.printf('%4d      %.4f            %.4f%n', s, a, b);
+  }
+  out.printf('%nMayor distancia a 0.5 con 20 lanzamientos     : %.4f%n', max20);
+  out.printf('Mayor distancia a 0.5 con 100000 lanzamientos : %.4f%n', max100k);
+  out.println('Ley de los grandes numeros: al repetir mas, la frecuencia se acerca a la teoria.');
+  return out.text();
+};
+CALC.e03_1 = function () { var s = 'EJERCICIO E03-1: regla empirica de la normal\nIntervalo     Porcentaje de datos\n';
+  for (var k = 1; k <= 3; k++) s += F('mu +/- %d sigma    %.2f %%%n', k, 100 * areaNormal(-k, k)); return s; };
+CALC.e04_2 = function () { var s = 'EJERCICIO E04-2: error estandar con sigma = 24\n';
+  [16, 64, 144].forEach(function (n) { s += F('n = %3d   EE = 24 / raiz(%d) = %.2f%n', n, n, 24 / Math.sqrt(n)); });
+  return s + 'Al cuadruplicar n el error se divide a la mitad.\n'; };
+CALC.e05_1 = function () { return 'EJERCICIO E05-1: error estandar con sigma = 20\n' + F('n = 100   EE = %.2f%n', 20 / Math.sqrt(100)) + F('n = 400   EE = %.2f%n', 20 / Math.sqrt(400)) + 'Hizo falta 4 veces mas datos (400 / 100) para dividir el error a la mitad.\n'; };
+CALC.e05_2 = function () { return 'EJERCICIO E05-2: distribucion de x-barra, poblacion asimetrica\nmu = 50   sigma = 30   n = 36\nForma  : aproximadamente NORMAL (TLC: n = 36 >= 30)\n' + F('Centro : mu = %.0f%n', 50.0) + F('EE     : 30 / raiz(36) = %.2f%n', 30 / Math.sqrt(36)); };
+CALC.e06_1 = function () { var x = [12, 15, 11, 14, 13], m = 0, q = 0;
+  x.forEach(function (v) { m += v / x.length; }); x.forEach(function (v) { q += (v - m) * (v - m); });
+  var s2 = q / (x.length - 1);
+  return 'EJERCICIO E06-1: muestra {12, 15, 11, 14, 13}\n' + F('x-barra = %.2f%n', m) + F('suma de cuadrados = %.2f   (n - 1 = %d)%n', q, x.length - 1) + F('s^2 = %.2f%n', s2) + F('s   = %.2f%n', Math.sqrt(s2)); };
+CALC.e06_2 = function () { return 'EJERCICIO E06-2: proporcion de diabeticos\n' + F('p-gorro = 20/80 = %.2f   (estimador: p-gorro = x / n)%n', 20.0 / 80); };
+CALC.e07_1 = function () { var xb = 50, s = 10, t = 2.064, ee = s / Math.sqrt(25), mg = t * ee;
+  return 'EJERCICIO E07-1: IC 95 % para la media (n = 25)\n' + F('EE = 10 / raiz(25) = %.2f   margen = %.3f x %.2f = %.3f%n', ee, t, ee, mg) + F('IC 95 %% = (%.2f ; %.2f)%n', xb - mg, xb + mg); };
+CALC.e07_2 = function () { var s = 10, t25 = criticoT(0.05, 24), t100 = criticoT(0.05, 99), w25 = 2 * t25 * s / 5, w100 = 2 * t100 * s / 10;
+  return 'EJERCICIO E07-2: ancho del intervalo al crecer n (x-barra = 50, s = 10)\n' + F('n =  25   t = %.3f   ancho = %.2f%n', t25, w25) + F('n = 100   t = %.3f   ancho = %.2f%n', t100, w100) + F('El intervalo se estrecha a %.0f %% del ancho anterior.%n', 100 * w100 / w25); };
+CALC.e08_1 = function () { var p = 36.0 / 120, ee = Math.sqrt(p * (1 - p) / 120), mg = 1.96 * ee;
+  return 'EJERCICIO E08-1: IC 95 % para una proporcion\n' + F('p-gorro = 36/120 = %.3f   EE = %.4f   margen = %.4f%n', p, ee, mg) + F('IC 95 %% = (%.3f ; %.3f)%n', p - mg, p + mg); };
+CALC.e08_2 = function () { var n = 1.96 * 1.96 * 0.5 * 0.5 / (0.05 * 0.05);
+  return 'EJERCICIO E08-2: tamano de muestra para margen de error 5 %\n' + F('n = z^2 p (1-p) / e^2 = 1.96^2 x 0.5 x 0.5 / 0.05^2 = %.2f%n', n) + F('Se necesitan n = %.0f personas (se redondea hacia arriba)%n', Math.ceil(n)); };
+CALC.e09_1 = function () { var z = (52 - 50) / (8 / Math.sqrt(64)), p = 2 * (1 - cdfNormal(Math.abs(z)));
+  return 'EJERCICIO E09-1: prueba z (x-barra = 52, mu0 = 50, sigma = 8, n = 64)\n' + F('z = (52 - 50) / (8 / 8) = %.2f   Valor p = %.4f%n', z, p) +
+    'alfa = 0.05 -> ' + (p < 0.05 ? 'se RECHAZA H0' : 'NO se rechaza H0') + '\n' + 'alfa = 0.01 -> ' + (p < 0.01 ? 'se RECHAZA H0' : 'NO se rechaza H0') + '\n'; };
+CALC.e10_1 = function () { var t = (52 - 50) / (10 / Math.sqrt(25)), p = pDosColasT(t, 24), tc = criticoT(0.05, 24);
+  return 'EJERCICIO E10-1: prueba t (n = 25, x-barra = 52, s = 10, mu0 = 50)\n' + F('t = (52 - 50) / (10 / 5) = %.2f   gl = 24   Valor p = %.4f%n', t, p) + F('Valor critico = +/-%.3f%n', tc) +
+    (Math.abs(t) > tc ? 'DECISION: se RECHAZA H0\n' : 'DECISION: NO se rechaza H0 (|t| < critico)\n'); };
+CALC.e10_2 = function () { var ph = 0.30, p0 = 0.20, ee = Math.sqrt(p0 * (1 - p0) / 100), z = (ph - p0) / ee, p = 2 * (1 - cdfNormal(Math.abs(z)));
+  return 'EJERCICIO E10-2: prueba z para una proporcion (30 de 100, p0 = 0.20)\n' + F('EE bajo H0 = %.4f   z = %.2f   Valor p = %.4f%n', ee, z, p) +
+    (p < 0.05 ? 'DECISION: se RECHAZA H0 (la proporcion difiere de 0.20)\n' : 'DECISION: NO se rechaza H0\n'); };
+CALC.e12_1 = function () { var k = 4, m = k * (k - 1) / 2;
+  return 'EJERCICIO E12-1: comparaciones por parejas con 4 grupos\n' + F('Parejas = 4 x 3 / 2 = %d%n', m) + F('P(al menos una falsa alarma) ~ 1 - 0.95^%d = %.4f  (%.1f %%)%n', m, 1 - Math.pow(0.95, m), 100 * (1 - Math.pow(0.95, m))); };
+CALC.e12_2 = function () { var Fv = 30.0 / 6, p = pColaF(Fv, 3, 20);
+  return 'EJERCICIO E12-2: ANOVA con 4 grupos y 24 observaciones\ngl entre = k - 1 = 3     gl dentro = N - k = 20\n' + F('F = 30 / 6 = %.2f   Valor p = %.4f   F critico (3, 20 gl) = 3.098%n', Fv, p) +
+    (Fv > 3.098 ? 'DECISION: se RECHAZA H0 (al menos un grupo difiere)\n' : 'DECISION: NO se rechaza H0\n'); };
+CALC.e13_1 = function () { var o = [[30, 20], [10, 40]], tf = [50, 50], tc = [40, 60], chi = 0;
+  var s = 'EJERCICIO E13-1: tabla 2 x 2   [30 20 / 10 40]\nFrecuencias esperadas:\n';
+  for (var i = 0; i < 2; i++) { for (var j = 0; j < 2; j++) { var e = tf[i] * tc[j] / 100; chi += (o[i][j] - e) * (o[i][j] - e) / e; s += F('%8.2f', e); } s += '\n'; }
+  s += F('Chi-cuadrado = %.3f   gl = 1   Valor p = %.5f   critico = 3.841%n', chi, pChi2(chi, 1));
+  return s + (chi > 3.841 ? 'DECISION: se RECHAZA la independencia\n' : 'DECISION: NO se rechaza H0\n'); };
+CALC.e13_2 = function () { return 'EJERCICIO E13-2: grados de libertad de una tabla 4 x 3\ngl = (filas - 1) x (columnas - 1) = (4 - 1) x (3 - 1) = 6\n'; };
+CALC.e13_3 = function () { var o = [8, 12, 9, 11, 10, 10], chi = 0; o.forEach(function (x) { chi += (x - 10) * (x - 10) / 10; });
+  return 'EJERCICIO E13-3: dado lanzado 60 veces\nObservadas: 8 12 9 11 10 10   Esperada por cara = 10\n' + F('Chi-cuadrado = %.3f   gl = 5   Valor p = %.4f   critico = 11.07%n', chi, pChi2(chi, 5)) +
+    (chi > 11.07 ? 'DECISION: se RECHAZA H0 (dado no justo)\n' : 'DECISION: NO se rechaza H0 (no hay evidencia de que sea injusto)\n'); };
+CALC.e14_1 = function () { var a = 151.80, b = -2.218;
+  return 'EJERCICIO E14-1: predicciones con la recta  y = 151.80 - 2.218 x\n' + F('x =  3 horas  ->  y = %.2f mmHg   (dentro del rango observado 1-10)%n', a + b * 3) + F('x = 20 horas  ->  y = %.2f mmHg   (EXTRAPOLACION: fuera del rango)%n', a + b * 20); };
+CALC.e14_2 = function () { return 'EJERCICIO E14-2: coeficiente de determinacion\n' + F('r = 0.8   R^2 = r^2 = %.2f   (la recta explica el %.0f %% de la variabilidad de y)%n', 0.64, 64.0); };
+CALC.e15_1 = function () { var x = [12, 15, 15, 20], orden = x.slice().sort(function (a, b) { return a - b; }), s = 'EJERCICIO E15-1: rangos de 12, 15, 15 y 20\nDato   Rango\n';
+  x.forEach(function (v) { var pr = 0, ul = 0; for (var i = 0; i < orden.length; i++) if (orden[i] === v) { if (pr === 0) pr = i + 1; ul = i + 1; } s += F('%4.0f   %.1f%n', v, (pr + ul) / 2.0); });
+  return s + 'Los empates reciben el rango promedio.\n'; };
+CALC.e15_2 = function () { var n = 10, k = 1, cola = 0; for (var i = 0; i <= k; i++) cola += comb(n, i) / Math.pow(2, n);
+  return 'EJERCICIO E15-2: prueba de los signos (9 mejoran, 1 empeora, n = 10)\n' + F('P(X <= 1) = (1 + 10) / 1024 = %.5f%n', cola) + F('Valor p bilateral = 2 x P(X <= 1) = %.5f%n', 2 * cola) +
+    (2 * cola < 0.05 ? 'DECISION: se RECHAZA H0 (el tratamiento mejora)\n' : 'DECISION: NO se rechaza H0\n'); };
+
+/* ================= REGISTRO ================= */
+var ITEMS = [];
+function add(g, id, t, fn) { ITEMS.push({ grupo: g, id: id, titulo: t, run: fn }); }
+var P = 'Programas completos del libro';
+add(P, 'E01', 'De la descripción a la inferencia', function () { return PROG.E01(); });
+add(P, 'E02', 'Probabilidad para inferir', function () { return PROG.E02(); });
+add(P, 'E03', 'Distribuciones clave', function () { return PROG.E03(); });
+add(P, 'E04', 'Muestreo y distribuciones muestrales', function () { return PROG.E04(); });
+add(P, 'E05', 'Teorema del Límite Central', function () { return PROG.E05(); });
+add(P, 'E06', 'Estimación puntual', function () { return PROG.E06(); });
+add(P, 'E07', 'Intervalo de confianza para la media', function () { return PROG.E07(); });
+add(P, 'E08', 'Intervalos para proporciones y varianzas', function () { return PROG.E08(); });
+add(P, 'E09', 'Fundamentos de la prueba de hipótesis', function () { return PROG.E09(); });
+add(P, 'E10', 'Pruebas para una media y una proporción', function () { return PROG.E10(); });
+add(P, 'E11', 'Comparación de dos grupos', function () { return PROG.E11(); });
+add(P, 'E12', 'Análisis de varianza (ANOVA)', function () { return PROG.E12(); });
+add(P, 'E13', 'Pruebas chi-cuadrado', function () { return PROG.E13(); });
+add(P, 'E14', 'Correlación y regresión lineal', function () { return PROG.E14(); });
+add(P, 'E15', 'Pruebas no paramétricas', function () { return PROG.E15(); });
+var g;
+g = 'E01 · Ejercicios'; add(g, 'E01-4', 'Muestra {34, 62, 60, 57, 55}: ¿cambia el error?', function () { return PROG.E01({ muestra: [34, 62, 60, 57, 55] }); });
+g = 'E02 · Ejercicios';
+add(g, 'E02-1', 'Probabilidad de sacar un as (baraja de 52)', CALC.e02_1);
+add(g, 'E02-2', 'Probabilidad de demanda en 300 contratos', CALC.e02_2);
+add(g, 'E02-3', 'Defectuosas esperadas en un lote de 10 000', CALC.e02_3);
+add(g, 'E02-4', 'Moneda: 20 lanzamientos frente a 100 000', CALC.e02_4);
+g = 'E03 · Ejercicios';
+add(g, 'E03-1', 'Porcentaje de datos en ±1, ±2 y ±3 desviaciones', CALC.e03_1);
+add(g, 'E03-4', 'Área bajo la normal entre −2 y 2', function () { return PROG.E03({ a: -2, b: 2, etiqueta: 'P(-2 < Z < 2) ~ %.4f   (regla empirica: 0.95)%n' }); });
+g = 'E04 · Ejercicios';
+add(g, 'E04-2', 'Error estándar con σ = 24 y n = 16, 64, 144', CALC.e04_2);
+add(g, 'E04-4', 'Muestreo con n = 100 en lugar de 25', function () { return PROG.E04({ n: 100 }); });
+g = 'E05 · Ejercicios';
+add(g, 'E05-1', 'Error estándar con σ = 20 y n = 100, 400', CALC.e05_1);
+add(g, 'E05-2', 'Distribución de x̄ con μ = 50, σ = 30, n = 36', CALC.e05_2);
+add(g, 'E05-4', 'TLC agregando el tamaño n = 500', function () { return PROG.E05({ tamanos: [1, 5, 30, 100, 500] }); });
+g = 'E06 · Ejercicios';
+add(g, 'E06-1', 'x̄, s² y s de {12, 15, 11, 14, 13}', CALC.e06_1);
+add(g, 'E06-2', 'Proporción estimada: 20 diabéticos de 80', CALC.e06_2);
+add(g, 'E06-4', 'Simulación de s² con muestras de n = 20', function () { return PROG.E06({ nm: 20 }); });
+g = 'E07 · Ejercicios';
+add(g, 'E07-1', 'IC 95 % con n = 25, x̄ = 50, s = 10', CALC.e07_1);
+add(g, 'E07-2', 'Ancho del intervalo con n = 25 y n = 100', CALC.e07_2);
+add(g, 'E07-4', 'Cobertura de intervalos al 90 % (t = 1.796)', function () { return PROG.E07({ tSim: 1.796, nivel: 90 }); });
+g = 'E08 · Ejercicios';
+add(g, 'E08-1', 'IC 95 % para 36 demandas en 120 contratos', CALC.e08_1);
+add(g, 'E08-2', 'Tamaño de muestra para margen del 5 %', CALC.e08_2);
+add(g, 'E08-3', 'Intervalo para σ con s = 6', function () { return PROG.E08({ s: 6.0 }); });
+g = 'E09 · Ejercicios';
+add(g, 'E09-1', 'Prueba z: x̄ = 52, μ₀ = 50, σ = 8, n = 64', CALC.e09_1);
+add(g, 'E09-4', 'Prueba de hipótesis con α = 0.01', function () { return PROG.E09({ alfa: 0.01, zc: 2.576 }); });
+g = 'E10 · Ejercicios';
+add(g, 'E10-1', 'Prueba t: n = 25, x̄ = 52, s = 10, μ₀ = 50', CALC.e10_1);
+add(g, 'E10-2', 'Prueba z: 30 de 100 pacientes, π₀ = 0.20', CALC.e10_2);
+add(g, 'E10-4', 'Prueba t con μ₀ = 125', function () { return PROG.E10({ mu0: 125 }); });
+g = 'E11 · Ejercicios'; add(g, 'E11-4', 'Dos grupos reducidos a cinco datos', function () { return PROG.E11({ cinco: true }); });
+g = 'E12 · Ejercicios';
+add(g, 'E12-1', 'Comparaciones por parejas con 4 grupos', CALC.e12_1);
+add(g, 'E12-2', 'F con CM entre = 30 y CM dentro = 6', CALC.e12_2);
+add(g, 'E12-4', 'ANOVA con los métodos A y B idénticos', function () { return PROG.E12({ BigualA: true }); });
+g = 'E13 · Ejercicios';
+add(g, 'E13-1', 'χ² de una tabla 2 × 2', CALC.e13_1);
+add(g, 'E13-2', 'Grados de libertad de una tabla 4 × 3', CALC.e13_2);
+add(g, 'E13-3', '¿Es justo el dado? (60 lanzamientos)', CALC.e13_3);
+add(g, 'E13-4', 'Tabla de E13 con frecuencias duplicadas', function () { return PROG.E13({ tabla: [[16, 44, 80], [40, 50, 50]] }); });
+g = 'E14 · Ejercicios';
+add(g, 'E14-1', 'Predicciones con la recta (3 y 20 horas)', CALC.e14_1);
+add(g, 'E14-2', 'Coeficiente de determinación con r = 0.8', CALC.e14_2);
+add(g, 'E14-4', 'Regresión con un valor atípico (160)', function () { return PROG.E14({ ultimoY: 160 }); });
+g = 'E15 · Ejercicios';
+add(g, 'E15-1', 'Rangos de 12, 15, 15 y 20', CALC.e15_1);
+add(g, 'E15-2', 'Prueba de los signos: 9 de 10 mejoraron', CALC.e15_2);
+add(g, 'E15-3', 'Mann–Whitney y Welch con un 480', function () { return PROG.E15({ grande: 480 }); });
+
+function ejecutar(it) { return '► LAB ' + it.id + ' — ' + it.titulo + '\n' + repeat('-', 60) + '\n' + stripTrailing(it.run()) + '\n'; }
+
+root.LabCore = { ITEMS: ITEMS, ejecutar: ejecutar, jfmt: jfmt, JRandom: JRandom };
+if (typeof module !== 'undefined' && module.exports) module.exports = root.LabCore;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function(){
+'use strict';
+var ITEMS = LabCore.ITEMS, lista = document.getElementById('lista'), salida = document.getElementById('salida');
+var ultimo = '';
+var ICON_P = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v4H7zM5 8h14a2 2 0 0 1 2 2v6h-4v4H7v-4H3v-6a2 2 0 0 1 2-2zm4 6v4h6v-4z"/></svg>';
+var ICON_C = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+var rows = {}, grupos = [];
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+(function construir(){
+  var actual = null, cont = null;
+  ITEMS.forEach(function(it){
+    if (it.grupo !== actual){
+      actual = it.grupo;
+      var h = document.createElement('h2'); h.className = 'grupo' + (it.grupo.indexOf('Programas')===0 ? ' prog' : ''); h.textContent = it.grupo;
+      lista.appendChild(h); grupos.push(h); cont = h;
+    }
+    var r = document.createElement('div'); r.className='row'; r.id='fila-'+it.id; r.dataset.g = it.grupo;
+    r.dataset.txt = (it.id+' '+it.titulo+' '+it.grupo).toLowerCase();
+    r.innerHTML = '<span class="id">'+it.id+'</span><span class="t">'+esc(it.titulo)+'</span>'+
+      '<div class="btns">'+
+      '<button type="button" class="b-con" data-a="con" aria-label="Ejecutar '+it.id+' y mostrar por consola">'+ICON_C+'Consola</button>'+
+      '<button type="button" class="b-imp" data-a="imp" aria-label="Ejecutar '+it.id+' e imprimir">'+ICON_P+'Imprimir</button>'+
+      '<button type="button" class="b-both" data-a="both" aria-label="Ejecutar '+it.id+', mostrar por consola e imprimir">Ambos</button></div>';
+    r.querySelector('.btns').addEventListener('click', function(ev){
+      var b = ev.target.closest('button'); if(!b) return; ejecutar(it, b.dataset.a);
+    });
+    lista.appendChild(r); rows[it.id] = {el:r, it:it};
+  });
+})();
+
+function pintar(texto){
+  var lineas = texto.split('\n'), html = '';
+  for (var i=0;i<lineas.length;i++){
+    var l = esc(lineas[i]);
+    if (i===0) l = '<span class="h">'+l+'</span>';
+    else if (/^-{20,}$/.test(lineas[i])) l = '<span class="d">'+l+'</span>';
+    html += l + '\n';
+  }
+  salida.innerHTML = html;
+}
+function marcar(id){
+  Object.keys(rows).forEach(function(k){ rows[k].el.classList.toggle('sel', k===id); });
+}
+function imprimir(texto, it){
+  document.getElementById('printPre').textContent = texto;
+  document.getElementById('piePrint').textContent = 'Ejercicio/programa ' + it.id + ' · ' + new Date().toLocaleDateString('es-CO');
+  try { window.print(); }
+  catch(e){ aviso('Tu navegador bloqueó la impresión desde esta página. Usa «Copiar» o abre el Laboratorio en su propia pestaña.'); }
+}
+function aviso(msg){ salida.innerHTML += '\n<span class="d">'+esc(msg)+'</span>\n'; }
+
+function ejecutar(it, accion){
+  var texto;
+  try { texto = LabCore.ejecutar(it); }
+  catch(e){ texto = '► LAB '+it.id+'\nERROR: '+e.message+'\n'; }
+  ultimo = texto;
+  marcar(it.id);
+  if (accion === 'con' || accion === 'both') {
+    pintar(texto);
+    try { history.replaceState(null,'','#'+it.id); } catch(e){}
+    if (window.matchMedia('(max-width:860px)').matches) salida.parentNode.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  if (accion === 'imp' || accion === 'both') setTimeout(function(){ imprimir(texto, it); }, 60);
+}
+
+document.getElementById('q').addEventListener('input', function(){
+  var q = this.value.trim().toLowerCase(), vis = {};
+  Object.keys(rows).forEach(function(k){
+    var r = rows[k].el, ok = !q || r.dataset.txt.indexOf(q) >= 0;
+    r.style.display = ok ? '' : 'none'; if (ok) vis[r.dataset.g] = true;
+  });
+  grupos.forEach(function(h){ h.style.display = vis[h.textContent] ? '' : 'none'; });
+});
+document.getElementById('bLimpiar').addEventListener('click', function(){
+  ultimo=''; marcar(''); salida.innerHTML='<span class="d">Consola limpia.</span>';
+});
+document.getElementById('bCopiar').addEventListener('click', function(){
+  var b = this, txt = ultimo || salida.textContent;
+  function ok(){ var o=b.textContent; b.textContent='Copiado'; setTimeout(function(){b.textContent=o;},1200); }
+  try { navigator.clipboard.writeText(txt).then(ok, function(){ aviso('No se pudo copiar automáticamente; selecciona el texto y usa Ctrl+C.'); }); }
+  catch(e){ aviso('No se pudo copiar automáticamente; selecciona el texto y usa Ctrl+C.'); }
+});
+
+try{ if (window.top !== window) document.getElementById('avisoVisor').hidden = false; }catch(e){ document.getElementById('avisoVisor').hidden = false; }
+function desdeHash(){
+  var id = decodeURIComponent((location.hash||'').slice(1)).toUpperCase();
+  if (id && rows[id]) { rows[id].el.scrollIntoView({block:'center'}); ejecutar(rows[id].it,'con'); }
+}
+window.addEventListener('hashchange', desdeHash);
+desdeHash();
+})();
+</script>
+</body>
+</html>
